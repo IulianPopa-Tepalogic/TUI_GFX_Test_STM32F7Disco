@@ -6,13 +6,14 @@
  */
 
 #include "tos.h"
+#include "stm32f746xx.h"
 #include "core_cm7.h"
 
-extern stm_setup_clocks(void);
+extern void stm_setup_clocks(void);
 
 void __tos_clocks_init_stage_hook(void)
 {
-	stm_setup_clocks(void);
+	stm_setup_clocks();
 
     SysTick->CTRL = 0;
     SysTick->LOAD = 2700000 - 1;

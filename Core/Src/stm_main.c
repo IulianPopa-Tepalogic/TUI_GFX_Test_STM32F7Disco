@@ -19,9 +19,6 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "string.h"
-#include "cmsis_os.h"
-#include "fatfs.h"
-#include "usb_host.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -103,7 +100,6 @@ UART_HandleTypeDef huart6;
 
 SDRAM_HandleTypeDef hsdram1;
 
-osThreadId defaultTaskHandle;
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -182,12 +178,12 @@ void stm_main(void)
   MX_CRC_Init();
   MX_DCMI_Init();
   MX_DMA2D_Init();
-  MX_ETH_Init();
-  MX_FMC_Init();
+//  MX_ETH_Init();
+//  MX_FMC_Init();
   MX_I2C1_Init();
   MX_I2C3_Init();
   MX_LTDC_Init();
-  MX_QUADSPI_Init();
+//  MX_QUADSPI_Init();
   MX_RTC_Init();
   MX_SAI2_Init();
   MX_SDMMC1_SD_Init();
@@ -199,8 +195,8 @@ void stm_main(void)
   MX_TIM5_Init();
   MX_TIM8_Init();
   MX_TIM12_Init();
-  MX_USART1_UART_Init();
-  MX_USART6_UART_Init();
+  //MX_USART1_UART_Init();
+  //MX_USART6_UART_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -223,8 +219,6 @@ void stm_main(void)
 
   /* Create the thread(s) */
   /* definition and creation of defaultTask */
-  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 4096);
-  defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 }
 
 /**
@@ -1620,18 +1614,6 @@ static void MX_GPIO_Init(void)
   * @retval None
   */
 /* USER CODE END Header_StartDefaultTask */
-void StartDefaultTask(void const * argument)
-{
-  /* init code for USB_HOST */
-  MX_USB_HOST_Init();
-  /* USER CODE BEGIN 5 */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
-  /* USER CODE END 5 */
-}
 
 /**
   * @brief  Period elapsed callback in non blocking mode

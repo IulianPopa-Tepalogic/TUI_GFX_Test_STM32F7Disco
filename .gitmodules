@@ -1,0 +1,6 @@
+[submodule "TOS"]
+	path = TOS
+	url = git@github.com:IulianPopa-Tepalogic/TOS.git
+[submodule "TUI"]
+	path = TUI
+	url = git@github.com:IulianPopa-Tepalogic/TUI.git
