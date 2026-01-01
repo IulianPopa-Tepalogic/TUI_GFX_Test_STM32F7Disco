@@ -179,15 +179,15 @@ void stm_main(void)
   MX_DCMI_Init();
   MX_DMA2D_Init();
 //  MX_ETH_Init();
-//  MX_FMC_Init();
+  MX_FMC_Init();
   MX_I2C1_Init();
   MX_I2C3_Init();
   MX_LTDC_Init();
-//  MX_QUADSPI_Init();
+  MX_QUADSPI_Init();
   MX_RTC_Init();
   MX_SAI2_Init();
   MX_SDMMC1_SD_Init();
-  MX_SPDIFRX_Init();
+//  MX_SPDIFRX_Init();
   MX_SPI2_Init();
   MX_TIM1_Init();
   MX_TIM2_Init();

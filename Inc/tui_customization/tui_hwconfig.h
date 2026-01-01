@@ -69,6 +69,7 @@ static constexpr PIXEL_COLOR_ENCODINGS HW_COLOR_ENCODE = USED_COLOR_ENCODING;
 typedef char TUI_CHAR;
 
 #define TUI_MUTEX TOS_MUTEX
+#define TUI_MUTEX_INIT(m) tos_init_mutex(m)
 #define TUI_MUTEX_LOCK(m) tos_lock_mutex(m)
 #define TUI_MUTEX_TRY_LOCK(m, msTmo) tos_try_lock_mutex(m, tos_ms2ticks(msTmo))
 #define TUI_MUTEX_UNLOCK(m) tos_unlock_mutex(m)

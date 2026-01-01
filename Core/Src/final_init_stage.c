@@ -5,11 +5,8 @@
  *      Author: ipopa
  */
 
-extern void stm_main(void);
-
 void __tos_final_init_stage_hook()
 {
-	stm_main();
 }
 
 

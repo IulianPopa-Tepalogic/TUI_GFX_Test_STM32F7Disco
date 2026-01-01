@@ -16,16 +16,15 @@ void __tos_clocks_init_stage_hook(void)
 	stm_setup_clocks();
 
     SysTick->CTRL = 0;
-    SysTick->LOAD = 2700000 - 1;
+    SysTick->LOAD = 27000 - 1;
     SysTick->VAL = 0;
-    SysTick->CTRL = 0; // ENABLE=1, TICKINT=1, CLKSOURCE=0 (HCLK/8)
+    SysTick->CTRL = 3; // ENABLE=1, TICKINT=1, CLKSOURCE=0 (HCLK/8)
 
-    tos_set_ticks_per_second(1);
+    tos_set_ticks_per_second(1000);
+    HAL_SetTickFreq(1000);
 }
 
 void __tos_clocks_tick_callback()
 {
-	/* NOTE:
-	 * This functions does nothing for now!
-	 */
+	HAL_IncTick();
 }
