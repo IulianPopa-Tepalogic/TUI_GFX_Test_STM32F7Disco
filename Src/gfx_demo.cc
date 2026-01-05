@@ -1,18 +1,23 @@
 #include "tos_procs.h"
 #include "tos.h"
 
+#include <algorithm>
+
 #include "Screen.h"
 
 Screen lcd;
 
-static const int backDemoStartMs = 0;
-static const int backDemoLengthMs = 10 * 1000;
-static const int demoLengthMs = backDemoStartMs + backDemoLengthMs;
+static constexpr int backDemoStartMs = 0;
+static constexpr int backDemoLengthMs = 10 * 1000;
+static constexpr int lines1DemoStart = backDemoStartMs + backDemoLengthMs;
+static constexpr int lines1DemoLength = 10 * 1000;
+static constexpr int demoLengthMs = lines1DemoStart + lines1DemoLength;
+
+static constexpr Pixel white(255, 255, 255);
 
 static void demo_background_update(uint32_t ms)
 {
-	static const Pixel white(255, 255, 255);
-	static const int animationLengthMs = 1000;
+	static constexpr int animationLengthMs = 1000;
 	static int color = 0;
 	static int lastValue = -1;
 	static bool toDark = false;
@@ -42,20 +47,54 @@ static void demo_background_update(uint32_t ms)
 }
 
 
+static void demo_draw_lines(uint32_t ms)
+{
+	static constexpr uint32_t lineCount = 5;
+	static constexpr uint32_t animationLengthMs = 2000;
+
+	lcd.fillColor(Pixel());
+
+	ms %= animationLengthMs;
+
+	uint32_t hvalue = SCREEN_WIDTH_SIZE * ms / animationLengthMs;
+	uint32_t vvalue = SCREEN_HEIGHT_SIZE * ms / animationLengthMs;
+
+	const uint32_t vsize = 150;
+
+	const auto c = std::max<uint32_t>(white.red * ms / animationLengthMs, 4);
+	Pixel color(c, c, c);
+
+	const auto lineWidth = std::max<uint32_t>(ms % 15, 1);
+	for (uint32_t i = 0; i < lineCount; ++i)
+		lcd.drawHLine(0, vvalue + i * vsize / 5, SCREEN_WIDTH_SIZE, lineWidth, color);
+
+	for (uint32_t i = 0; i < lineCount; ++i)
+		lcd.drawVLine(hvalue + i * vsize / 5, 0, SCREEN_HEIGHT_SIZE, lineWidth, color);
+}
+
+
 TOS_PROCESS(gfx_demo, 10240)
 {
 	int lastDrawTime = 0;
 	lcd.m_showFps = true;
+	uint32_t lastMs = 0;
 
 	while (true)
 	{
-		int ctime = (int)(tos_ticks2ms(tos_ticks()) % demoLengthMs);
+		const uint32_t ctick = tos_ticks();
+		const uint32_t ctime = (tos_ticks2ms(ctick) % demoLengthMs);
+
+		lcd.startFrameDrawing();
 
 		if ((backDemoStartMs <= ctime) && (ctime <= backDemoLengthMs))
 		{
-			lcd.startFrameDrawing();
 			demo_background_update(ctime - backDemoStartMs);
-			lcd.endFrameDrawing(true);
 		}
+		else if ((lines1DemoStart <= ctime) && (ctime <= lines1DemoStart + lines1DemoLength))
+		{
+			demo_draw_lines(ctime - lines1DemoStart);
+		}
+
+		lcd.endFrameDrawing(true);
 	}
 }

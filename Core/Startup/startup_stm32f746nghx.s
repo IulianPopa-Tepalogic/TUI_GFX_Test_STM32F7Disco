@@ -252,12 +252,12 @@ g_pfnVectors:
   .word     UART7_IRQHandler                  /* UART7                        */
   .word     UART8_IRQHandler                  /* UART8                        */
   .word     SPI4_IRQHandler                   /* SPI4                         */
-  .word     SPI5_IRQHandler                   /* SPI5                           */
+  .word     SPI5_IRQHandler                   /* SPI5                         */
   .word     SPI6_IRQHandler                   /* SPI6                         */
-  .word     SAI1_IRQHandler                   /* SAI1                          */
-  .word     LTDC_IRQHandler                   /* LTDC                          */
-  .word     LTDC_ER_IRQHandler                /* LTDC error                      */
-  .word     DMA2D_IRQHandler                  /* DMA2D                          */
+  .word     SAI1_IRQHandler                   /* SAI1                         */
+  .word     tui_vsync_irq_handler             /* LTDC - LTDC_IRQHandler       */
+  .word     LTDC_ER_IRQHandler                /* LTDC error                   */
+  .word     DMA2D_IRQHandler                  /* DMA2D                        */
   .word     SAI2_IRQHandler                   /* SAI2                         */
   .word     QUADSPI_IRQHandler                /* QUADSPI                      */
   .word     LPTIM1_IRQHandler                 /* LPTIM1                       */
@@ -566,6 +566,9 @@ g_pfnVectors:
 
    .weak      LTDC_IRQHandler
    .thumb_set LTDC_IRQHandler,Default_Handler
+
+   .weak      tui_vsync_irq_handler
+   .thumb_set tui_vsync_irq_handler,Default_Handler
 
    .weak      LTDC_ER_IRQHandler
    .thumb_set LTDC_ER_IRQHandler,Default_Handler

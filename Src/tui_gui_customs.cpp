@@ -11,6 +11,7 @@ static uint8_t* _mainBuffer = reinterpret_cast<uint8_t*>(0xC0000000);
 static uint8_t* _shadowBuffer = _mainBuffer + SCREEN_MEM_SIZE;
 
 static constexpr uint32_t DCACHE_LINE_SIZE = 32;
+static int sgProcessToVSync = -1;
 
 static void DCache_CleanByAddr32(const void *addr, uint32_t size)
 {
@@ -33,9 +34,14 @@ void __tui_commit_shadow_buffer()
 {
 	DCache_CleanByAddr32(_shadowBuffer,  SCREEN_MEM_SIZE);
 
+	LTDC->IER |= LTDC_IER_RRIE;
+
 	const auto addr = reinterpret_cast<uint32_t>(_shadowBuffer);
 	LTDC_Layer1->CFBAR = addr;
 	LTDC->SRCR = LTDC_SRCR_VBR;
+
+	sgProcessToVSync = tos_cpid();
+	tos_freeze_pid(sgProcessToVSync); //it will be waked up from IRQ
 
 	std::swap(_mainBuffer, _shadowBuffer);
 }
@@ -48,4 +54,27 @@ void __tui_warning(const char* s)
 void __tui_error(const char* s)
 {
 	tos_critical_fault();
+}
+
+
+extern "C"
+{
+
+void tui_vsync_irq_handler()
+{
+    if ((LTDC->ISR & LTDC_ISR_RRIF) && (LTDC->IER & LTDC_IER_RRIE))
+    {
+        LTDC->ICR = LTDC_ICR_CRRIF;
+
+    	if (sgProcessToVSync > 0)
+    	{
+    		tos_thaw_pid(sgProcessToVSync);
+    		sgProcessToVSync = -1;
+    		LTDC->IER &= ~LTDC_IER_RRIE;
+    	}
+    }
+
+	tos_ack_irq(LTDC_IRQn);
+}
+
 }

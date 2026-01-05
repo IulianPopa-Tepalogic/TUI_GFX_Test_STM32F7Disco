@@ -7,9 +7,12 @@
 
 #include "tos.h"
 #include "stm32f746xx.h"
+#include "stm32f7xx_hal.h"
 #include "core_cm7.h"
 
 extern void stm_setup_clocks(void);
+
+
 
 void __tos_clocks_init_stage_hook(void)
 {
