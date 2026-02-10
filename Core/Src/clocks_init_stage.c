@@ -13,7 +13,6 @@
 extern void stm_setup_clocks(void);
 
 
-
 void __tos_clocks_init_stage_hook(void)
 {
 	stm_setup_clocks();
@@ -24,8 +23,9 @@ void __tos_clocks_init_stage_hook(void)
     SysTick->CTRL = 3; // ENABLE=1, TICKINT=1, CLKSOURCE=0 (HCLK/8)
 
     tos_set_ticks_per_second(1000);
-    HAL_SetTickFreq(1000);
+    HAL_SetTickFreq(HAL_TICK_FREQ_1KHZ);
 }
+
 
 void __tos_clocks_tick_callback()
 {

@@ -14,25 +14,29 @@ extern void stm_main(void);
 
 static void MPU_Config_SDRAM_WBWA(void)
 {
-  MPU_Region_InitTypeDef MPU_InitStruct;
+	  MPU_Region_InitTypeDef MPU_InitStruct;
 
-  HAL_MPU_Disable();
+	  HAL_MPU_Disable();
 
-  MPU_InitStruct.Enable           = MPU_REGION_ENABLE;
-  MPU_InitStruct.Number           = MPU_REGION_NUMBER0;
-  MPU_InitStruct.BaseAddress      = 0xC0000000;
-  MPU_InitStruct.Size             = MPU_REGION_SIZE_8MB;
-  MPU_InitStruct.AccessPermission = MPU_REGION_FULL_ACCESS;
-  MPU_InitStruct.IsBufferable     = MPU_ACCESS_BUFFERABLE;
-  MPU_InitStruct.IsCacheable      = MPU_ACCESS_CACHEABLE;
-  MPU_InitStruct.IsShareable      = MPU_ACCESS_NOT_SHAREABLE;
-  MPU_InitStruct.Number           = MPU_REGION_NUMBER0;
-  MPU_InitStruct.TypeExtField     = MPU_TEX_LEVEL0;
-  MPU_InitStruct.SubRegionDisable = 0x00;
-  MPU_InitStruct.DisableExec      = MPU_INSTRUCTION_ACCESS_ENABLE;
-  HAL_MPU_ConfigRegion(&MPU_InitStruct);
+	  // ------------------------------------------------------------
+	  // Region 0: 8MB SDRAM, WBWA
+	  // ------------------------------------------------------------
+	  MPU_InitStruct.Enable           = MPU_REGION_ENABLE;
+	  MPU_InitStruct.Number           = MPU_REGION_NUMBER0;
+	  MPU_InitStruct.BaseAddress      = 0xC0000000;
+	  MPU_InitStruct.Size             = MPU_REGION_SIZE_8MB;
+	  MPU_InitStruct.AccessPermission = MPU_REGION_FULL_ACCESS;
+	  MPU_InitStruct.IsShareable      = MPU_ACCESS_NOT_SHAREABLE;
+	  MPU_InitStruct.DisableExec      = MPU_INSTRUCTION_ACCESS_ENABLE;
 
-  HAL_MPU_Enable(MPU_PRIVILEGED_DEFAULT);
+	  // WBWA: TEX=1, C=1, B=1
+	  MPU_InitStruct.TypeExtField     = MPU_TEX_LEVEL1;
+	  MPU_InitStruct.IsCacheable      = MPU_ACCESS_CACHEABLE;
+	  MPU_InitStruct.IsBufferable     = MPU_ACCESS_BUFFERABLE;
+
+	  HAL_MPU_ConfigRegion(&MPU_InitStruct);
+
+	  HAL_MPU_Enable(MPU_PRIVILEGED_DEFAULT);
 }
 
 static void SDRAM_Initialization_Sequence(SDRAM_HandleTypeDef *hsdram)
@@ -74,11 +78,7 @@ static void SDRAM_Initialization_Sequence(SDRAM_HandleTypeDef *hsdram)
   Command.ModeRegisterDefinition = modeReg;
   HAL_SDRAM_SendCommand(hsdram, &Command, HAL_MAX_DELAY);
 
-  /* Step 5: Set the refresh rate counter */
-  // RefreshRate = (SDCLK_Hz * 64ms / 4096) - margin
-  // Margin is often ~20 cycles; board examples use a fixed value.
-  // Compute based on your SDCLK!
-  uint32_t refresh = 0; // <-- compute properly for your clock
+  uint32_t refresh = 0x606;
   HAL_SDRAM_ProgramRefreshRate(hsdram, refresh);
 }
 

@@ -7,8 +7,9 @@
 
 #include "stm32f746xx.h"
 
-static uint32_t SCREEN_MEM_SIZE = (SCREEN_HEIGHT_SIZE * SCREEN_WIDTH_SIZE * Pixel::BITS_PER_PIXEL / 8);
-static uint8_t* _mainBuffer = reinterpret_cast<uint8_t*>(0xC0000000);
+
+static constexpr uint32_t SCREEN_MEM_SIZE = (SCREEN_HEIGHT_SIZE * SCREEN_WIDTH_SIZE * Pixel::BITS_PER_PIXEL / 8);
+static uint8_t *_mainBuffer = reinterpret_cast<uint8_t*>(0xC0000000);
 static uint8_t* _shadowBuffer = _mainBuffer + SCREEN_MEM_SIZE;
 
 static constexpr uint32_t DCACHE_LINE_SIZE = 32;
@@ -33,7 +34,7 @@ void* __tui_get_shadow_buffer()
 
 void __tui_commit_shadow_buffer()
 {
-	DCache_CleanByAddr32(_shadowBuffer,  SCREEN_MEM_SIZE);
+    DCache_CleanByAddr32(_shadowBuffer,  SCREEN_MEM_SIZE);
 
 	LTDC->ICR = LTDC_ICR_CRRIF;
 	LTDC->IER |= LTDC_IER_RRIE | LTDC_IER_FUIE;

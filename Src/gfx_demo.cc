@@ -23,8 +23,10 @@ static constexpr int lines2DDPPDemoStart = lines2PPDemoStart + lines2PPDemoLengt
 static constexpr int lines2DDPPDemoLength = 10 * 1000;
 static constexpr int circlesDemoStart =  lines2DDPPDemoStart + lines2DDPPDemoLength;
 static constexpr int circlesDemoLength = 10 * 1000;
+static constexpr int semiCirclesDemoStart =  circlesDemoStart + circlesDemoLength;
+static constexpr int semiCirclesDemoLength = 20 * 1000;
 
-static constexpr int demoLengthMs = circlesDemoStart + circlesDemoLength;
+static constexpr int demoLengthMs = semiCirclesDemoStart + semiCirclesDemoLength;
 
 static constexpr Pixel white(255, 255, 255);
 
@@ -151,19 +153,7 @@ static void demo_draw_lines2(uint32_t ms)
 
 	float angle = 360.0f * ms / animationLengthMs;
 
-	const int diff = ms % 50 + 1;
-
 	lcd.fillColor(bgPixel);
-#if 0
-	lcd.drawLine(0, SCREEN_HEIGHT_SIZE / 2 - 30, SCREEN_WIDTH_SIZE - 1, SCREEN_HEIGHT_SIZE / 2 -30 - diff, Pixel(0xFF, 0xFF, 0xFF));
-
-	lcd.drawLine(0, SCREEN_HEIGHT_SIZE / 2 + 30, SCREEN_WIDTH_SIZE - 1, SCREEN_HEIGHT_SIZE / 2 + 30 + diff, Pixel(0xFF, 0xFF, 0xFF));
-
-	lcd.drawLine(SCREEN_WIDTH_SIZE / 2 - 30, 0, SCREEN_WIDTH_SIZE / 2 - 30 - diff, SCREEN_HEIGHT_SIZE - 1, Pixel(0xFF, 0xFF, 0xFF));
-
-	lcd.drawLine(SCREEN_WIDTH_SIZE / 2 + 30, 0, SCREEN_WIDTH_SIZE / 2 + 30 + diff, SCREEN_HEIGHT_SIZE - 1, Pixel(0xFF, 0xFF, 0xFF));
-
-#else
 	for (int trailing = 1; trailing < 5; trailing++) {
 
 		Pixel p = Canvas::combinePixels(Pixel(0xFF, 0, 0), bgPixel, 1.f - 1.f / trailing);
@@ -200,7 +190,6 @@ static void demo_draw_lines2(uint32_t ms)
 		p = Canvas::combinePixels(Pixel(0XFF, 0, 0xFF), bgPixel, 1.f - 1.f / trailing);
 		lcd.drawSlopedLine(SCREEN_WIDTH_SIZE + 100, SCREEN_HEIGHT_SIZE + 100, 1000, angle - 20 - trailing * 1.3f, p);
 	}
-#endif
 }
 
 
@@ -333,6 +322,28 @@ static void demo_draw_circles(uint32_t ms)
 	lcd.drawCircle(SCREEN_WIDTH_SIZE - 120 - ms % 100, 200 - ms % 100, ms % 68, 1, Pixel(0x10, 0xFF, 0x40));
 }
 
+static void demo_draw_semicircles(uint32_t ms)
+{
+	static float angle = .0f;
+	static constexpr Pixel bgPixel = Pixel(1, 1, 1);
+
+	static constexpr int animationLengthMs = 3000;
+	ms %= animationLengthMs;
+	if (ms == 0) ms = 1;
+
+	angle += 10.f;
+	if (angle > 360.f) angle = .0f;
+
+	lcd.fillColor(bgPixel);
+
+	lcd.drawSemiCircle(SCREEN_WIDTH_SIZE / 2, SCREEN_HEIGHT_SIZE / 2, 100, 10, Unicolor(0xFF, 0xFF, 0Xff), angle, angle - 60);
+	lcd.drawSemiCircle(50, 60, 20, 5, Unicolor(0xFF, 0x22, 0X11), angle, angle + 60);
+	lcd.drawSemiCircle(400, 40, 35, 7, Unicolor(0x10, 0xFF, 0x20), angle, angle - 90);
+
+	lcd.drawSemiCircle(SCREEN_WIDTH_SIZE - 81, 200, 12, 20, Unicolor(030, 0x20, 0X60), angle, angle + 30);
+	lcd.drawSemiCircle(120, 160,  100, 30, Unicolor(0x10, 0x0, 0x10), angle, angle - 30);
+}
+
 
 TOS_PROCESS(gfx_demo, 10240)
 {
@@ -340,13 +351,8 @@ TOS_PROCESS(gfx_demo, 10240)
 
 	while (true)
 	{
-#if 1
 		uint32_t ctick = tos_ticks();
 		uint32_t ctime = (tos_ticks2ms(ctick) % demoLengthMs);
-#else
-		uint32_t ctick = tos_ticks();
-		uint32_t ctime = (tos_ticks2ms(ctick) % lines2DemoLength) + lines2DemoStart;
-#endif
 
 		lcd.startFrameDrawing();
 
@@ -381,6 +387,10 @@ TOS_PROCESS(gfx_demo, 10240)
 		else if ((circlesDemoStart <= ctime) && (ctime <= circlesDemoStart + circlesDemoLength))
 		{
 			demo_draw_circles(ctime - circlesDemoStart);
+		}
+		else if ((semiCirclesDemoStart <= ctime) && (ctime <= semiCirclesDemoStart + semiCirclesDemoLength))
+		{
+			demo_draw_semicircles(ctime - semiCirclesDemoStart);
 		}
 
 		lcd.endFrameDrawing(true);
